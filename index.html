@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>大和高山 法楽寺 - 仏像・石仏検索</title>
+    <style>
+        :root {
+            --primary-color: #4A3C31; /* 消炭色（深い茶色） */
+            --accent-color: #D4AF37;  /* 黄金色 */
+            --bg-color: #F9F8F6;      /* 生成り色 */
+            --text-color: #2C2C2C;
+            --white: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        header {
+            text-align: center;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--accent-color);
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 1.6rem;
+            letter-spacing: 0.3em;
+            color: var(--primary-color);
+        }
+
+        /* ページ管理 */
+        .page {
+            display: none;
+            animation: fadeIn 0.4s ease forwards;
+        }
+
+        .active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 名称検索グリッド */
+        .name-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .name-btn {
+            background: var(--white);
+            border: 1px solid #ddd;
+            padding: 15px 10px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: 0.2s;
+        }
+
+        .name-btn:hover {
+            border-color: var(--accent-color);
+            background: #fffdf5;
+        }
+
+        /* --- コントロールパネル (ボタン2段配置) --- */
+        .controls-bar {
+            background: #eeeae4;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .control-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        /* アイコンボタン（レイアウト・文字サイズ） */
+        .icon-btn {
+            background: var(--white);
+            border: 1px solid #ccc;
+            padding: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+            border-radius: 4px;
+            min-width: 44px;
+        }
+
+        .icon-btn.active {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+        }
+
+        .icon-btn svg {
+            width: 24px;
+            height: 24px;
+            fill: currentColor;
+        }
+
+        /* 文字サイズボタン */
+        .size-btn {
+            font-weight: bold;
+            height: 38px;
+            padding: 0 12px;
+        }
+
+        /* ナビゲーションボタン */
+        .txt-btn {
+            padding: 10px 16px;
+            font-size: 0.9rem;
+            background: var(--white);
+            border: 1px solid var(--primary-color);
+            cursor: pointer;
+            border-radius: 4px;
+            white-space: nowrap;
+            min-width: 80px;
+        }
+
+        .txt-btn:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        /* --- 詳細表示エリア --- */
+        .detail-content {
+            background: white;
+            padding: 30px 20px;
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .detail-content.vertical {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .detail-content.vertical img {
+            width: 100%;
+            max-width: 450px;
+            margin-bottom: 25px;
+        }
+
+        .detail-content.horizontal {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .detail-content img {
+            width: 100%;
+            height: auto;
+            border: 1px solid #eee;
+        }
+
+        /* テキスト情報の共通設定 */
+        .info-area {
+            width: 100%;
+            text-align: center;
+        }
+
+        .info-area h2 {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+            color: var(--primary-color);
+            display: inline-block;
+            border-bottom: 2px solid var(--accent-color); /* 名称の下にアンダーライン */
+            padding-bottom: 4px;
+        }
+
+        .furigana {
+            font-size: 1rem;
+            color: #777;
+            margin-bottom: 25px;
+            display: block;
+        }
+
+        .description {
+            line-height: 1.9;
+            text-align: justify;
+        }
+
+        /* 文字サイズ定義の更新 */
+        .f-small { font-size: 1rem; }    /* 旧：中 */
+        .f-medium { font-size: 1.25rem; } /* 旧：大 */
+        .f-large { font-size: 1.6rem; }  /* 新：さらに大きく */
+
+        @media (max-width: 650px) {
+            .detail-content.horizontal { grid-template-columns: 1fr; }
+            .txt-btn { padding: 8px 10px; font-size: 0.8rem; min-width: 70px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1 onclick="showPage('top')" style="cursor:pointer">大和高山 法楽寺</h1>
+    </header>
+
+    <section id="top" class="page active">
+        <div style="display:flex; flex-direction:column; gap:20px; margin-top:40px;">
+            <div style="background:white; border:1px solid var(--primary-color); padding:25px; cursor:pointer;" onclick="showPage('search-name')">
+                <h2>① 名称から検索</h2>
+                <p>仏さま・石仏のお名前からご案内します</p>
+            </div>
+            <div style="background:white; border:1px solid var(--primary-color); padding:25px; cursor:pointer;" onclick="alert('配置図準備中')">
+                <h2>② 場所から検索</h2>
+                <p>境内図から場所を選んでご案内します</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="search-name" class="page">
+        <div class="name-grid" id="nameList"></div>
+        <div style="text-align:center; margin-top:30px;">
+            <button class="txt-btn" onclick="showPage('top')">TOPへ戻る</button>
+        </div>
+    </section>
+
+    <section id="detail" class="page">
+        <div class="controls-bar">
+            <div class="control-row">
+                <button class="icon-btn active" id="btn-vert" onclick="setLayout('vertical')" title="縦レイアウト">
+                    <svg viewBox="0 0 24 24"><path d="M7 2h10a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm0 2v16h10V4H7z"/></svg>
+                </button>
+                <button class="icon-btn" id="btn-hori" onclick="setLayout('horizontal')" title="横レイアウト">
+                    <svg viewBox="0 0 24 24"><path d="M22 7v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2zm-2 0H4v10h16V7z"/></svg>
+                </button>
+                <div style="width: 10px;"></div> <button class="icon-btn size-btn" id="fs-s" onclick="setFontSize('small')">小</button>
+                <button class="icon-btn size-btn" id="fs-m" onclick="setFontSize('medium')">中</button>
+                <button class="icon-btn size-btn active" id="fs-l" onclick="setFontSize('large')">大</button>
+            </div>
+            <div class="control-row">
+                <button class="txt-btn" onclick="showPage('search-name')">🔝一覧へ戻る</button>
+                <button class="txt-btn" onclick="prevDeity()">🔙戻る</button>
+                <button class="txt-btn" onclick="nextDeity()">進む🔜</button>
+                <button class="txt-btn" onclick="alert('配置図を表示します')">配置図</button>
+            </div>
+        </div>
+
+        <div id="detailView" class="detail-content vertical"></div>
+    </section>
+</div>
+
+<script>
+    // 仏様データ
+    const buddhaData = [
+        { 
+            id: 1, 
+            name: "薬師如来", 
+            furigana: "やくしにょらい", 
+            description: "薬師本願功徳経では、薬師如来は東方浄瑠璃世界（瑠璃光浄土とも称される）の教主で、菩薩の時に12の大願を発し、この世門における衆生の疾病を治癒して寿命を延べ、災禍を消去し、衣食などを満足せしめ、かつ仏行を行じては無上菩提の妙果を証らしめんと誓い仏と成ったと説かれる。瑠璃光を以て衆生の病苦を救うとされている。無明の病を直す法薬を与える医薬の仏として、如来には珍しく現世利益信仰を集める。" 
+        },
+        { id: 2, name: "八幡大菩薩", furigana: "はちまんだいぼさつ", description: "八幡神が仏教と習合し、菩薩の号を授けられた姿です。文武の神として古くから武家や民衆に広く信仰されてきました。" },
+        { id: 3, name: "文殊菩薩", furigana: "もんじゅぼさつ", description: "知恵を司る菩薩です。獅子の背に乗り、右手に知恵の剣を持つ姿が一般的です。" },
+        { id: 4, name: "十一面観音菩薩", furigana: "じゅういちめんかんのんぼさつ", description: "頭上に十一の顔を持ち、あらゆる方向を見守り救済する観音様です。" },
+        { id: 5, name: "大日如来", furigana: "だいにちにょらい", description: "密教において宇宙そのものとされる根本仏です。" }
+    ];
+
+    // ダミーデータの補完
+    const additionalNames = ["十二天屏風", "不動明王", "大黒天", "弘法大師立像", "青面金剛石碑", "六地蔵菩薩", "三十三観音菩薩", "地蔵菩薩立像", "羅刹天", "水天", "風天", "毘沙門天", "日天", "焔摩天", "地天", "火天", "帝釈天", "伊舎那天", "月天", "梵天", "龍猛菩薩", "龍智菩薩", "金剛智三蔵", "不空三蔵", "善無畏三蔵", "一行阿闍梨", "恵果阿闍梨", "弘法大師"];
+    additionalNames.forEach((name, i) => {
+        buddhaData.push({ id: i + 6, name: name, furigana: "ふりがな準備中", description: name + "の詳細説明文は現在準備中です。" });
+    });
+
+    let currentIndex = 0;
+    let currentLayout = 'vertical';
+    let currentFontSize = 'large'; // デフォルトを大に変更
+
+    // 一覧生成
+    const nameListDiv = document.getElementById('nameList');
+    buddhaData.forEach((item, index) => {
+        const btn = document.createElement('div');
+        btn.className = 'name-btn';
+        btn.innerText = `${index + 1}. ${item.name}`;
+        btn.onclick = () => {
+            currentIndex = index;
+            renderDetail();
+            showPage('detail');
+        };
+        nameListDiv.appendChild(btn);
+    });
+
+    function showPage(pageId) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById(pageId).classList.add('active');
+        window.scrollTo(0, 0);
+    }
+
+    function setLayout(mode) {
+        currentLayout = mode;
+        const view = document.getElementById('detailView');
+        const bVert = document.getElementById('btn-vert');
+        const bHori = document.getElementById('btn-hori');
+        if (mode === 'vertical') {
+            view.classList.replace('horizontal', 'vertical');
+            bVert.classList.add('active'); bHori.classList.remove('active');
+        } else {
+            view.classList.replace('vertical', 'horizontal');
+            bVert.classList.remove('active'); bHori.classList.add('active');
+        }
+        renderDetail();
+    }
+
+    function setFontSize(size) {
+        currentFontSize = size;
+        document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(`fs-${size.charAt(0)}`).classList.add('active');
+        renderDetail();
+    }
+
+    function nextDeity() {
+        currentIndex = (currentIndex + 1) % buddhaData.length;
+        renderDetail();
+    }
+
+    function prevDeity() {
+        currentIndex = (currentIndex - 1 + buddhaData.length) % buddhaData.length;
+        renderDetail();
+    }
+
+    function renderDetail() {
+        const data = buddhaData[currentIndex];
+        const view = document.getElementById('detailView');
+        const fontSizeClass = `f-${currentFontSize}`;
+        const noImg = `https://via.placeholder.com/500x600?text=${encodeURIComponent(data.name)}`;
+
+        view.innerHTML = `
+            <div class="img-area">
+                <img src="image/${data.id}.jpg" alt="${data.name}" onerror="this.src='${noImg}'">
+            </div>
+            <div class="info-area">
+                <h2>${data.name}</h2>
+                <span class="furigana">${data.furigana}</span>
+                <p class="description ${fontSizeClass}">${data.description}</p>
+            </div>
+        `;
+    }
+</script>
+
+</body>
+</html>
