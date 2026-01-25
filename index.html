@@ -6,18 +6,14 @@
     <title>大和高山 法楽寺 - 仏像・石仏検索</title>
     <style>
         :root {
-            --primary-color: #4A3C31; /* 消炭色（深い茶色） */
-            --accent-color: #D4AF37;  /* 黄金色 */
-            --bg-color: #F9F8F6;      /* 生成り色 */
+            --primary-color: #4A3C31;
+            --accent-color: #D4AF37;
+            --bg-color: #F9F8F6;
             --text-color: #2C2C2C;
             --white: #ffffff;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
             font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
@@ -27,350 +23,236 @@
             overflow-x: hidden;
         }
 
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 20px;
-            min-height: 100vh;
-        }
+        .container { max-width: 900px; margin: 0 auto; padding: 20px; min-height: 100vh; }
 
-        header {
-            text-align: center;
-            padding: 20px 0;
-            border-bottom: 1px solid var(--accent-color);
-            margin-bottom: 20px;
-        }
+        header { text-align: center; padding: 20px 0; border-bottom: 1px solid var(--accent-color); margin-bottom: 20px; }
+        h1 { font-size: 1.6rem; letter-spacing: 0.3em; color: var(--primary-color); }
 
-        h1 {
-            font-size: 1.6rem;
-            letter-spacing: 0.3em;
-            color: var(--primary-color);
-        }
+        .page { display: none; animation: fadeIn 0.4s ease forwards; }
+        .active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* ページ管理 */
-        .page {
-            display: none;
-            animation: fadeIn 0.4s ease forwards;
+        /* --- 高速スライドショー --- */
+        #slideshow-container {
+            width: 100%; height: 60vh; display: flex; justify-content: center; align-items: center;
+            background: #000; border-radius: 8px; overflow: hidden; position: relative; cursor: pointer;
         }
-
-        .active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(5px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        #slideshow-img { width: 100%; height: 100%; object-fit: contain; }
 
         /* 名称検索グリッド */
-        .name-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-            gap: 10px;
-            margin-top: 20px;
-        }
+        .name-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin-top: 20px; }
+        .name-btn { background: var(--white); border: 1px solid #ddd; padding: 15px 10px; text-align: center; cursor: pointer; font-size: 0.85rem; }
 
-        .name-btn {
-            background: var(--white);
-            border: 1px solid #ddd;
-            padding: 15px 10px;
-            text-align: center;
-            cursor: pointer;
-            font-size: 0.85rem;
-            transition: 0.2s;
-        }
-
-        .name-btn:hover {
-            border-color: var(--accent-color);
-            background: #fffdf5;
-        }
-
-        /* --- コントロールパネル (ボタン2段配置) --- */
-        .controls-bar {
-            background: #eeeae4;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 25px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .control-row {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        /* アイコンボタン（レイアウト・文字サイズ） */
-        .icon-btn {
-            background: var(--white);
-            border: 1px solid #ccc;
-            padding: 6px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: 0.2s;
-            border-radius: 4px;
-            min-width: 44px;
-        }
-
-        .icon-btn.active {
-            background: var(--primary-color);
-            border-color: var(--primary-color);
-            color: white;
-        }
-
-        .icon-btn svg {
-            width: 24px;
-            height: 24px;
-            fill: currentColor;
-        }
-
-        /* 文字サイズボタン */
-        .size-btn {
-            font-weight: bold;
-            height: 38px;
-            padding: 0 12px;
-        }
-
-        /* ナビゲーションボタン */
-        .txt-btn {
-            padding: 10px 16px;
-            font-size: 0.9rem;
-            background: var(--white);
-            border: 1px solid var(--primary-color);
-            cursor: pointer;
-            border-radius: 4px;
-            white-space: nowrap;
-            min-width: 80px;
-        }
-
-        .txt-btn:hover {
-            background: var(--primary-color);
-            color: white;
-        }
+        /* コントロールパネル */
+        .controls-bar { background: #eeeae4; padding: 15px; border-radius: 8px; margin-bottom: 25px; display: flex; flex-direction: column; gap: 15px; }
+        .control-row { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 10px; }
+        .icon-btn { background: var(--white); border: 1px solid #ccc; padding: 6px; cursor: pointer; display: flex; align-items: center; border-radius: 4px; }
+        .icon-btn.active { background: var(--primary-color); color: white; }
+        .icon-btn svg { width: 24px; height: 24px; fill: currentColor; }
+        .size-btn { font-weight: bold; height: 38px; padding: 0 12px; }
+        .txt-btn { padding: 10px 16px; font-size: 0.9rem; background: var(--white); border: 1px solid var(--primary-color); cursor: pointer; border-radius: 4px; }
 
         /* --- 詳細表示エリア --- */
-        .detail-content {
-            background: white;
-            padding: 30px 20px;
-            border-radius: 4px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        }
+        .detail-content { background: white; padding: 30px 20px; border-radius: 4px; }
+        .detail-content.vertical { display: flex; flex-direction: column; align-items: center; }
+        .detail-content.horizontal { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
 
-        .detail-content.vertical {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .detail-content.vertical img {
-            width: 100%;
-            max-width: 450px;
-            margin-bottom: 25px;
-        }
-
-        .detail-content.horizontal {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-        }
-
-        .detail-content img {
-            width: 100%;
-            height: auto;
+        /* 画像タップ拡大仕様 */
+        .img-area { display: flex; justify-content: center; align-items: flex-start; }
+        .clickable-img { 
+            cursor: zoom-in; 
+            transition: width 0.3s ease; 
             border: 1px solid #eee;
+            width: 25%; /* 初期サイズ 1/4 */
         }
+        .clickable-img.expanded { width: 100%; cursor: zoom-out; }
 
-        /* テキスト情報の共通設定 */
-        .info-area {
-            width: 100%;
-            text-align: center;
-        }
-
-        .info-area h2 {
-            font-size: 1.8rem;
-            margin-bottom: 8px;
-            color: var(--primary-color);
-            display: inline-block;
-            border-bottom: 2px solid var(--accent-color); /* 名称の下にアンダーライン */
-            padding-bottom: 4px;
-        }
-
-        .furigana {
-            font-size: 1rem;
-            color: #777;
-            margin-bottom: 25px;
-            display: block;
-        }
-
-        .description {
-            line-height: 1.9;
-            text-align: justify;
-        }
-
-        /* 文字サイズ定義の更新 */
-        .f-small { font-size: 1rem; }    /* 旧：中 */
-        .f-medium { font-size: 1.25rem; } /* 旧：大 */
-        .f-large { font-size: 1.6rem; }  /* 新：さらに大きく */
+        .info-area { width: 100%; text-align: center; }
+        .info-area h2 { font-size: 1.8rem; margin-bottom: 8px; border-bottom: 2px solid var(--accent-color); display: inline-block; }
+        .furigana { font-size: 1rem; color: #777; margin-bottom: 25px; display: block; }
+        
+        .description { line-height: 1.9; text-align: justify; }
+        .f-small { font-size: 1rem; }
+        .f-medium { font-size: 1.25rem; }
+        .f-large { font-size: 1.6rem; }
 
         @media (max-width: 650px) {
             .detail-content.horizontal { grid-template-columns: 1fr; }
-            .txt-btn { padding: 8px 10px; font-size: 0.8rem; min-width: 70px; }
+            .clickable-img { width: 40%; }
+            .clickable-img.expanded { width: 100%; }
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <header>
-        <h1 onclick="showPage('top')" style="cursor:pointer">大和高山 法楽寺</h1>
-    </header>
+    <header><h1 onclick="location.reload()" style="cursor:pointer">大和高山 法楽寺</h1></header>
 
     <section id="top" class="page active">
-        <div style="display:flex; flex-direction:column; gap:20px; margin-top:40px;">
-            <div style="background:white; border:1px solid var(--primary-color); padding:25px; cursor:pointer;" onclick="showPage('search-name')">
-                <h2>① 名称から検索</h2>
-                <p>仏さま・石仏のお名前からご案内します</p>
-            </div>
-            <div style="background:white; border:1px solid var(--primary-color); padding:25px; cursor:pointer;" onclick="alert('配置図準備中')">
-                <h2>② 場所から検索</h2>
-                <p>境内図から場所を選んでご案内します</p>
-            </div>
+        <div id="slideshow-container" onclick="stopSlideshowAndGo()">
+            <img id="slideshow-img" src="" alt="法楽寺 仏像">
         </div>
+        <p style="text-align:center; margin-top:15px; font-size:0.8rem; color:#666;">画像をタップして一覧へ進む</p>
     </section>
 
     <section id="search-name" class="page">
         <div class="name-grid" id="nameList"></div>
-        <div style="text-align:center; margin-top:30px;">
-            <button class="txt-btn" onclick="showPage('top')">TOPへ戻る</button>
-        </div>
+        <div style="text-align:center; margin-top:30px;"><button class="txt-btn" onclick="location.reload()">TOPへ</button></div>
     </section>
 
     <section id="detail" class="page">
         <div class="controls-bar">
             <div class="control-row">
-                <button class="icon-btn active" id="btn-vert" onclick="setLayout('vertical')" title="縦レイアウト">
-                    <svg viewBox="0 0 24 24"><path d="M7 2h10a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm0 2v16h10V4H7z"/></svg>
-                </button>
-                <button class="icon-btn" id="btn-hori" onclick="setLayout('horizontal')" title="横レイアウト">
-                    <svg viewBox="0 0 24 24"><path d="M22 7v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2zm-2 0H4v10h16V7z"/></svg>
-                </button>
-                <div style="width: 10px;"></div> <button class="icon-btn size-btn" id="fs-s" onclick="setFontSize('small')">小</button>
+                <button class="icon-btn" id="btn-vert" onclick="setLayout('vertical')"><svg viewBox="0 0 24 24"><path d="M7 2h10a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm0 2v16h10V4H7z"/></svg></button>
+                <button class="icon-btn" id="btn-hori" onclick="setLayout('horizontal')"><svg viewBox="0 0 24 24"><path d="M22 7v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2zm-2 0H4v10h16V7z"/></svg></button>
+                <div style="width:10px;"></div>
+                <button class="icon-btn size-btn" id="fs-s" onclick="setFontSize('small')">小</button>
                 <button class="icon-btn size-btn" id="fs-m" onclick="setFontSize('medium')">中</button>
-                <button class="icon-btn size-btn active" id="fs-l" onclick="setFontSize('large')">大</button>
+                <button class="icon-btn size-btn" id="fs-l" onclick="setFontSize('large')">大</button>
             </div>
             <div class="control-row">
-                <button class="txt-btn" onclick="showPage('search-name')">🔝一覧へ戻る</button>
-                <button class="txt-btn" onclick="prevDeity()">🔙戻る</button>
-                <button class="txt-btn" onclick="nextDeity()">進む🔜</button>
-                <button class="txt-btn" onclick="alert('配置図を表示します')">配置図</button>
+                <button class="txt-btn" onclick="showPage('search-name')">一覧へ</button>
+                <button class="txt-btn" onclick="prevDeity()">前へ</button>
+                <button class="txt-btn" onclick="nextDeity()">次へ</button>
             </div>
         </div>
-
-        <div id="detailView" class="detail-content vertical"></div>
+        <div id="detailView" class="detail-content"></div>
     </section>
 </div>
 
 <script>
-    // 仏様データ
+    // CSVから取り込んだ全33体のデータ
     const buddhaData = [
-        { 
-            id: 1, 
-            name: "薬師如来", 
-            furigana: "やくしにょらい", 
-            description: "薬師本願功徳経では、薬師如来は東方浄瑠璃世界（瑠璃光浄土とも称される）の教主で、菩薩の時に12の大願を発し、この世門における衆生の疾病を治癒して寿命を延べ、災禍を消去し、衣食などを満足せしめ、かつ仏行を行じては無上菩提の妙果を証らしめんと誓い仏と成ったと説かれる。瑠璃光を以て衆生の病苦を救うとされている。無明の病を直す法薬を与える医薬の仏として、如来には珍しく現世利益信仰を集める。" 
-        },
-        { id: 2, name: "八幡大菩薩", furigana: "はちまんだいぼさつ", description: "八幡神が仏教と習合し、菩薩の号を授けられた姿です。文武の神として古くから武家や民衆に広く信仰されてきました。" },
-        { id: 3, name: "文殊菩薩", furigana: "もんじゅぼさつ", description: "知恵を司る菩薩です。獅子の背に乗り、右手に知恵の剣を持つ姿が一般的です。" },
-        { id: 4, name: "十一面観音菩薩", furigana: "じゅういちめんかんのんぼさつ", description: "頭上に十一の顔を持ち、あらゆる方向を見守り救済する観音様です。" },
-        { id: 5, name: "大日如来", furigana: "だいにちにょらい", description: "密教において宇宙そのものとされる根本仏です。" }
+        { id: 1, name: "薬師如来", furigana: "やくしにょらい", description: "薬師本願功徳経では、薬師如来は東方浄瑠璃世界（瑠璃光浄土とも称される）の教主で、菩薩の時に12の大願を発し、この世門における衆生の疾病を治癒して寿命を延べ、災禍を消去し、衣食などを満足せしめ、かつ仏行を行じては無上菩提の妙果を証らしめんと誓い仏と成ったと説かれる。瑠璃光を以て衆生の病苦を救うとされている。無明の病を直す法薬を与える医薬の仏として、如来には珍しく現世利益信仰を集める。" },
+        { id: 2, name: "八幡大菩薩", furigana: "はちまんだいぼさつ", description: "八幡大菩薩は日本で古いから尊崇される守護神で、武運長久だけでなく国家安泰や人々の生活を守る菩薩として信仰されています。" },
+        { id: 3, name: "文殊菩薩", furigana: "もんじゅぼさつ", description: "文殊菩薩は「三人寄れば文殊の知恵」といわれるように、すぐれた智慧を象徴する菩薩です。迷いを断ち正しい判断力を授ける存在として、学業成就や進学祈願でも広く信仰されています。" },
+        { id: 4, name: "十一面観音菩薩", furigana: "じゅういちめんかんのんぼさつ", description: "十一面観音菩薩は、頭上に十一の顔を持ち、あらゆる方向から衆生を守る観音さまです。" },
+        { id: 5, name: "十二天屏風", furigana: "じゅうにてんびょうぶ", description: "十二天とは、仏教を守護する十二の神々の総称です。東西南北の四方、北東・北西・南東・南西の四隅、さらに天地を加えた全方位を護るとされています。" },
+        { id: 6, name: "不動明王", furigana: "ふどうみょうおう", description: "不動明王は、大日如来の化身とされ、激しい憤怒の姿で人々を導き、煩悩や災いを断ち切る強力な守護神です。" },
+        { id: 7, name: "大黒天", furigana: "だいこくてん", description: "大黒天は、豊穣と財福を司る神として広く親しまれています。打ち出の小槌を持ち、人々に富と幸福を授ける存在です。" },
+        { id: 8, name: "弘法大師立像", furigana: "こうぼうだいしりゅうぞう", description: "真言宗の開祖である弘法大師（空海）の立ち姿を現した像です。修行中や巡礼の姿として、多くの人々に敬われています。" },
+        { id: 9, name: "青面金剛石碑", furigana: "しょうめんこんごうせきひ", description: "青面金剛は庚申信仰の本尊で、病魔や災厄を退け、長寿を授ける神として石碑などに刻まれます。" },
+        { id: 10, name: "六地蔵菩薩", furigana: "ろくじぞうぼさつ", description: "六地蔵は、仏教の六道（地獄・餓鬼・畜生・修羅・人間・天）を巡り、それぞれの世界で苦しむ人々を救う慈悲深い菩薩です。" },
+        { id: 11, name: "三十三観音菩薩", furigana: "さんじゅうさんかんのんぼさつ", description: "観音菩薩が人々を救うために三十三の姿に変身するという信仰に基づいたものです。" },
+        { id: 12, name: "地蔵菩薩立像", furigana: "じぞうぼさつりゅうぞう", description: "「お地蔵さま」として親しまれ、子供や旅人を守り、苦しみの身代わりとなって救済する菩薩の立ち姿です。" },
+        { id: 13, name: "羅刹天", furigana: "らせつてん", description: "十二天の一人で、南西を護る守護神。力強く、悪鬼を退ける神としての性質を持ちます。" },
+        { id: 14, name: "水天", furigana: "すいてん", description: "十二天の一人で、西を護る水の神。水難除けや豊作を祈る対象とされます。" },
+        { id: 15, name: "風天", furigana: "ふうてん", description: "十二天の一人で、北西を護る風の神。風の力を制御し、自然の調和を保ちます。" },
+        { id: 16, name: "毘沙門天", furigana: "びしゃもんてん", description: "十二天の一人で、北を護る守護神。財宝と勝利を司る神としても名高いです。" },
+        { id: 17, name: "日天", furigana: "にってん", description: "十二天の一人で、太陽を神格化した存在。闇を照らし、生命に活力を与えます。" },
+        { id: 18, name: "焔摩天", furigana: "えんまてん", description: "十二天の一人で、南を護る神。死後の裁きを行う王として知られますが、慈悲による救いも説かれます。" },
+        { id: 19, name: "地天", furigana: "ちてん", description: "十二天の一人で、大地を司る神。安定と恵みをもたらします。" },
+        { id: 20, name: "火天", furigana: "かてん", description: "十二天の一人で、南東を護る火の神。知恵の火で煩悩を焼き尽くします。" },
+        { id: 21, name: "帝釈天", furigana: "たいしゃくてん", description: "十二天の一人で、東を護る神。諸天の王として、仏教を強く守護します。" },
+        { id: 22, name: "伊舎那天", furigana: "いしゃなてん", description: "十二天の一人で、北東を護る神。世界の創造と破壊、そして再生を象徴します。" },
+        { id: 23, name: "月天", furigana: "がってん", description: "十二天の一人で、月を神格化した存在。穏やかな光で夜の闇と人々の心を癒します。" },
+        { id: 24, name: "梵天", furigana: "ぼんてん", description: "十二天の一人で、上方を護る神。宇宙の創造神としての性格を持ち、高い精神性を象徴します。" },
+        { id: 25, name: "大日如来", furigana: "だいにちにょらい", description: "密教において宇宙そのものとされる根本仏。すべての仏の源とされています。" },
+        { id: 26, name: "龍猛菩薩", furigana: "りゅうみょうぼさつ", description: "真言宗 伝持八祖 第一祖。大乗仏教の哲学を大成し、密教思想の基礎を築いた偉大な祖師です。" },
+        { id: 27, name: "龍智菩薩", furigana: "りゅうちぼさつ", description: "真言宗 伝持八祖 第二祖。龍猛の弟子で、密教の実践法を整備し伝えたとされます。" },
+        { id: 28, name: "金剛智三蔵", furigana: "こんごうちさんぞう", description: "真言宗 伝持八祖 第三祖。インドから中国へ密教を伝え、多くの経典を翻訳しました。" },
+        { id: 29, name: "不空三蔵", furigana: "ふくうさんぞう", description: "真言宗 伝持八祖 第四祖。唐の時代に密教を大いに広め、国王の師としても活躍しました。" },
+        { id: 30, name: "善無畏三蔵", furigana: "ぜんむいさんぞう", description: "真言宗 伝持八祖 第五祖。大日経などの重要な密教経典を中国にもたらしました。" },
+        { id: 31, name: "一行阿闍梨", furigana: "いちぎょうあじゃり", description: "真言宗 伝持八祖 第六祖。善無畏の弟子で、天文学や数学にも通じた優れた僧侶です。" },
+        { id: 32, name: "恵果阿闍梨", furigana: "けいかあじゃり", description: "真言宗 伝持八祖 第七祖。不空の弟子で、空海（弘法大師）に密教のすべてを伝承した師匠です。" },
+        { id: 33, name: "弘法大師", furigana: "こうぼうだいし", description: "真言宗 伝持八祖 第八祖。日本に密教をもたらし、高野山を開いた空海その人です。四国遍路の創始者としても仰がれます。" }
     ];
 
-    // ダミーデータの補完
-    const additionalNames = ["十二天屏風", "不動明王", "大黒天", "弘法大師立像", "青面金剛石碑", "六地蔵菩薩", "三十三観音菩薩", "地蔵菩薩立像", "羅刹天", "水天", "風天", "毘沙門天", "日天", "焔摩天", "地天", "火天", "帝釈天", "伊舎那天", "月天", "梵天", "龍猛菩薩", "龍智菩薩", "金剛智三蔵", "不空三蔵", "善無畏三蔵", "一行阿闍梨", "恵果阿闍梨", "弘法大師"];
-    additionalNames.forEach((name, i) => {
-        buddhaData.push({ id: i + 6, name: name, furigana: "ふりがな準備中", description: name + "の詳細説明文は現在準備中です。" });
-    });
-
+    // デフォルト設定：横レイアウト、サイズ中
     let currentIndex = 0;
-    let currentLayout = 'vertical';
-    let currentFontSize = 'large'; // デフォルトを大に変更
+    let currentLayout = 'horizontal'; 
+    let currentFontSize = 'medium'; 
+    let slideTimer;
 
-    // 一覧生成
-    const nameListDiv = document.getElementById('nameList');
-    buddhaData.forEach((item, index) => {
-        const btn = document.createElement('div');
-        btn.className = 'name-btn';
-        btn.innerText = `${index + 1}. ${item.name}`;
-        btn.onclick = () => {
-            currentIndex = index;
-            renderDetail();
-            showPage('detail');
-        };
-        nameListDiv.appendChild(btn);
-    });
+    // スライドショー（合計約2.5秒）
+    const slideImages = [];
+    let slideCount = 0;
+
+    function initSlideshow() {
+        // ランダムに10枚選出
+        const shuffled = [...Array(33).keys()].map(i => i + 1).sort(() => 0.5 - Math.random());
+        for(let i=0; i<10; i++) slideImages.push(shuffled[i]);
+        startSlide();
+    }
+
+    function startSlide() {
+        if (slideCount >= 10) { stopSlideshowAndGo(); return; }
+        const imgElement = document.getElementById('slideshow-img');
+        const id = slideImages[slideCount];
+        imgElement.src = `image/${id}.jpg`;
+        imgElement.onerror = () => { imgElement.src = `https://via.placeholder.com/500?text=Image+${id}`; };
+        slideCount++;
+        slideTimer = setTimeout(startSlide, 250); 
+    }
+
+    function stopSlideshowAndGo() {
+        clearTimeout(slideTimer);
+        showPage('search-name');
+    }
 
     function showPage(pageId) {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
         document.getElementById(pageId).classList.add('active');
-        window.scrollTo(0, 0);
-    }
-
-    function setLayout(mode) {
-        currentLayout = mode;
-        const view = document.getElementById('detailView');
-        const bVert = document.getElementById('btn-vert');
-        const bHori = document.getElementById('btn-hori');
-        if (mode === 'vertical') {
-            view.classList.replace('horizontal', 'vertical');
-            bVert.classList.add('active'); bHori.classList.remove('active');
-        } else {
-            view.classList.replace('vertical', 'horizontal');
-            bVert.classList.remove('active'); bHori.classList.add('active');
-        }
-        renderDetail();
-    }
-
-    function setFontSize(size) {
-        currentFontSize = size;
-        document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(`fs-${size.charAt(0)}`).classList.add('active');
-        renderDetail();
-    }
-
-    function nextDeity() {
-        currentIndex = (currentIndex + 1) % buddhaData.length;
-        renderDetail();
-    }
-
-    function prevDeity() {
-        currentIndex = (currentIndex - 1 + buddhaData.length) % buddhaData.length;
-        renderDetail();
+        if(pageId === 'detail') updateControlUI();
+        window.scrollTo(0,0);
     }
 
     function renderDetail() {
         const data = buddhaData[currentIndex];
         const view = document.getElementById('detailView');
         const fontSizeClass = `f-${currentFontSize}`;
-        const noImg = `https://via.placeholder.com/500x600?text=${encodeURIComponent(data.name)}`;
-
+        
+        view.className = `detail-content ${currentLayout}`;
         view.innerHTML = `
             <div class="img-area">
-                <img src="image/${data.id}.jpg" alt="${data.name}" onerror="this.src='${noImg}'">
+                <img src="image/${data.id}.jpg" 
+                     class="clickable-img" 
+                     onclick="this.classList.toggle('expanded')"
+                     onerror="this.src='https://via.placeholder.com/500?text=${encodeURIComponent(data.name)}'">
             </div>
             <div class="info-area">
                 <h2>${data.name}</h2>
                 <span class="furigana">${data.furigana}</span>
                 <p class="description ${fontSizeClass}">${data.description}</p>
+                <p style="font-size:0.7rem; color:#999; margin-top:10px;">※画像をタップで拡大/縮小</p>
             </div>
         `;
     }
-</script>
 
+    function setLayout(mode) {
+        currentLayout = mode;
+        updateControlUI();
+        renderDetail();
+    }
+
+    function setFontSize(size) {
+        currentFontSize = size;
+        updateControlUI();
+        renderDetail();
+    }
+
+    function updateControlUI() {
+        document.getElementById('btn-vert').classList.toggle('active', currentLayout === 'vertical');
+        document.getElementById('btn-hori').classList.toggle('active', currentLayout === 'horizontal');
+        document.querySelectorAll('.size-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.id === `fs-${currentFontSize.charAt(0)}`);
+        });
+    }
+
+    function nextDeity() { currentIndex = (currentIndex + 1) % buddhaData.length; renderDetail(); }
+    function prevDeity() { currentIndex = (currentIndex - 1 + buddhaData.length) % buddhaData.length; renderDetail(); }
+
+    // 初期化：リスト生成
+    const nameListDiv = document.getElementById('nameList');
+    buddhaData.forEach((item, index) => {
+        const btn = document.createElement('div');
+        btn.className = 'name-btn';
+        btn.innerText = `${item.id}. ${item.name}`;
+        btn.onclick = () => { currentIndex = index; renderDetail(); showPage('detail'); };
+        nameListDiv.appendChild(btn);
+    });
+
+    window.onload = initSlideshow;
+</script>
 </body>
 </html>
