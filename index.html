@@ -38,11 +38,11 @@
         }
         #slideshow-img { width: 100%; height: 100%; object-fit: contain; }
 
-        /* 名称検索グリッド */
+        /* 検索グリッド */
         .name-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px; margin-top: 15px; }
         .name-btn { background: var(--white); border: 1px solid #ddd; padding: 12px 8px; text-align: center; cursor: pointer; font-size: 0.8rem; border-radius: 4px; }
 
-        /* コントロールパネル */
+        /* コントロール */
         .controls-bar { background: #eeeae4; padding: 12px; border-radius: 8px; margin-bottom: 20px; display: flex; flex-direction: column; gap: 10px; }
         .control-row { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 8px; }
         .icon-btn { background: var(--white); border: 1px solid #ccc; padding: 6px; cursor: pointer; display: flex; align-items: center; border-radius: 4px; }
@@ -52,22 +52,24 @@
         .txt-btn { padding: 8px 12px; font-size: 0.8rem; background: var(--white); border: 1px solid var(--primary-color); cursor: pointer; border-radius: 4px; }
 
         /* --- 詳細表示エリア --- */
-        .detail-content { background: white; padding: 20px; border-radius: 4px; transition: all 0.3s; min-height: 400px; }
+        .detail-content { background: white; padding: 25px; border-radius: 4px; transition: all 0.3s; min-height: 400px; }
         
-        /* 横レイアウト：垂直中央揃えの強化 */
+        /* 横レイアウト：垂直・水平すべて中央揃え */
         .detail-content.horizontal {
             display: flex;
             flex-direction: row;
-            align-items: stretch; /* 子要素の高さを揃える */
-            gap: 20px;
+            align-items: center; /* 画像とテキストを垂直方向で中央に */
+            justify-content: center;
+            gap: 25px;
         }
-        .detail-content.horizontal .img-area { flex: 0 0 25%; display: flex; align-items: flex-start; }
+        .detail-content.horizontal .img-area { flex: 0 0 25%; display: flex; justify-content: center; align-items: center; }
         .detail-content.horizontal .info-area { 
             flex: 1; 
             display: flex; 
             flex-direction: column; 
-            justify-content: center; /* これで名称・ふりがな・説明全体が垂直中央に */
-            text-align: left; 
+            align-items: center; /* 名称とふりがなを水平中央に */
+            justify-content: center; 
+            text-align: center; /* 説明文を中央揃えに */
         }
 
         /* 縦レイアウト */
@@ -77,7 +79,7 @@
             align-items: center;
         }
         .detail-content.vertical .img-area { width: 100%; display: flex; justify-content: center; margin-bottom: 20px; }
-        .detail-content.vertical .info-area { width: 100%; text-align: center; }
+        .detail-content.vertical .info-area { width: 100%; text-align: center; align-items: center; display: flex; flex-direction: column; }
 
         /* 画像スタイル */
         .clickable-img { 
@@ -88,17 +90,30 @@
         }
         .vertical .clickable-img.expanded { width: 100% !important; }
 
-        .info-area h2 { font-size: 1.4rem; margin-bottom: 5px; border-bottom: 2px solid var(--accent-color); display: inline-block; }
+        /* 名称のアンダーライン調整 */
+        .info-area h2 { 
+            font-size: 1.4rem; 
+            margin-bottom: 5px; 
+            border-bottom: 2px solid var(--accent-color); 
+            display: inline-block; /* 文字幅に合わせる */
+            padding-bottom: 2px;
+            line-height: 1.2;
+        }
         .furigana { font-size: 0.9rem; color: #777; margin-bottom: 15px; display: block; }
         
-        .description { line-height: 1.7; text-align: justify; }
+        .description { line-height: 1.8; text-align: justify; text-justify: inter-character; width: 100%; }
+        /* 説明文の中央揃えを強制する場合 */
+        .horizontal .description { text-align: center; }
+
         .f-small { font-size: 0.9rem; }
         .f-medium { font-size: 1.1rem; }
         .f-large { font-size: 1.4rem; }
 
+        /* スマホ向け（横並び時） */
         @media (max-width: 480px) {
-            .detail-content.horizontal { gap: 10px; padding: 10px; }
+            .detail-content.horizontal { gap: 15px; padding: 15px; }
             .detail-content.horizontal .img-area { flex: 0 0 30%; }
+            .info-area h2 { font-size: 1.2rem; }
         }
     </style>
 </head>
@@ -144,6 +159,7 @@
 </div>
 
 <script>
+    // CSVから取得した全データ
     const buddhaData = [
         { id: 1, name: "薬師如来", furigana: "やくしにょらい", description: "薬師本願功徳経では、薬師如来は東方浄瑠璃世界（瑠璃光浄土とも称される）の教主で、菩薩の時に12の大願を発し、この世門における衆生の疾病を治癒して寿命を延べ、災禍を消去し、衣食などを満足せしめ、かつ仏行を行じては無上菩提の妙果を証らしめんと誓い仏と成ったと説かれる。瑠璃光を以て衆生の病苦を救うとされている。無明の病を直す法薬を与える医薬の仏として、如来には珍しく現世利益信仰を集める。" },
         { id: 2, name: "八幡大菩薩", furigana: "はちまんだいぼさつ", description: "八幡大菩薩は日本で古いから尊崇される守護神で、武運長久だけでなく国家安泰や人々の生活を守る菩薩として信仰されています。" },
@@ -170,10 +186,10 @@
         { id: 23, name: "月天", furigana: "がってん", description: "十二天の一人で、月を神格化した存在。穏やかな光で夜の闇と人々の心を癒します。" },
         { id: 24, name: "梵天", furigana: "ぼんてん", description: "十二天の一人で、上方を護る神。宇宙の創造神としての性格を持ち、高い精神性を象徴します。" },
         { id: 25, name: "大日如来", furigana: "だいにちにょらい", description: "密教において宇宙そのものとされる根本仏。すべての仏の源とされています。" },
-        { id: 26, name: "龍猛菩薩", furigana: "りゅうみょうぼさつ", description: "真言宗 伝持八祖 第一祖。大乗仏教の「空」の哲学を体系化し、密教思想の基礎を築いた大哲学者。密教の最初の祖師とされています。" },
-        { id: 27, name: "龍智菩薩", furigana: "りゅうちぼさつ", description: "真言宗 伝持八祖 第二祖。龍猛の弟子とされ、密教の修行法や観想法を整備しました。智慧と瞑想の両立を重視した人物です。" },
-        { id: 28, name: "金剛智三蔵", furigana: "こんごうちさんぞう", description: "真言宗 伝持八祖 第三祖。インドから中国へ密教を伝え、多くの経典を翻訳しました。" },
-        { id: 29, name: "不空三蔵", furigana: "ふくうさんぞう", description: "真言宗 伝持八祖 第四祖。唐の時代に密教を大いに広め、三代の皇帝に仕えた国師です。" },
+        { id: 26, name: "龍猛菩薩", furigana: "りゅうみょうぼさつ", description: "真言宗 伝持八祖 第一祖 サンスクリット名：ナーガールジュナ。大乗仏教の「空」の哲学を体系化し、密教思想の基礎を築いた大哲学者。密教の最初の祖師とされています。" },
+        { id: 27, name: "龍智菩薩", furigana: "りゅうちぼさつ", description: "真言宗 伝持八祖 第二祖 サンスクリット名：ナーガボーディ。龍猛の弟子とされ、密教の修行法や観想法を整備しました。智慧と瞑想の両立を重視した人物です。" },
+        { id: 28, name: "金剛智三蔵", furigana: "こんごうちさんぞう", description: "真言宗 伝持八祖 第三祖。南インド出身。インドから中国へ密教を伝え、多くの経典を翻訳しました。" },
+        { id: 29, name: "不空三蔵", furigana: "ふくうさんぞう", description: "真言宗 伝持八祖 第四祖。唐の時代に密教を大いに広め、三代の皇帝に仕えた国師。多くの密教経典を訳出した功労者です。" },
         { id: 30, name: "善無畏三蔵", furigana: "ぜんむいさんぞう", description: "真言宗 伝持八祖 第五祖。中インドの王子として生まれ、中国で「大日経」を訳出した密教の巨星です。" },
         { id: 31, name: "一行阿闍梨", furigana: "いちぎょうあじゃり", description: "真言宗 伝持八祖 第六祖。善無畏に師事し、密教の理論を大成させるとともに、優れた天文学者としても知られます。" },
         { id: 32, name: "恵果阿闍梨", furigana: "けいかあじゃり", description: "真言宗 伝持八祖 第七祖。不空から密教を受け継ぎ、空海にすべてを伝承した唐代密教の完成者です。" },
@@ -215,25 +231,11 @@
         window.scrollTo(0,0);
     }
 
-    // --- 自動スクロール演出 ---
     function triggerAutoScroll() {
         if (currentLayout !== 'vertical') return;
-        
-        // 少し待ってからスクロール開始
         setTimeout(() => {
-            // 下までスクロール
-            window.scrollTo({
-                top: document.body.scrollHeight,
-                behavior: 'smooth'
-            });
-
-            // 1秒後に上に戻る
-            setTimeout(() => {
-                window.scrollTo({
-                    top: 0,
-                    behavior: 'smooth'
-                });
-            }, 1000);
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+            setTimeout(() => { window.scrollTo({ top: 0, behavior: 'smooth' }); }, 1000);
         }, 300);
     }
 
@@ -251,10 +253,12 @@
                      onerror="this.src='https://via.placeholder.com/400?text=${encodeURIComponent(data.name)}'">
             </div>
             <div class="info-area">
-                <h2>${data.name}</h2>
-                <span class="furigana">${data.furigana}</span>
+                <div>
+                    <h2>${data.name}</h2>
+                    <span class="furigana">${data.furigana}</span>
+                </div>
                 <p class="description ${fontSizeClass}">${data.description}</p>
-                <p style="font-size:0.6rem; color:#aaa; margin-top:12px;">※画像をタップで拡大</p>
+                <p style="font-size:0.6rem; color:#aaa; margin-top:15px;">※画像をタップで拡大</p>
             </div>
         `;
     }
@@ -280,16 +284,8 @@
         });
     }
 
-    function nextDeity() { 
-        currentIndex = (currentIndex + 1) % buddhaData.length; 
-        renderDetail(); 
-        triggerAutoScroll();
-    }
-    function prevDeity() { 
-        currentIndex = (currentIndex - 1 + buddhaData.length) % buddhaData.length; 
-        renderDetail(); 
-        triggerAutoScroll();
-    }
+    function nextDeity() { currentIndex = (currentIndex + 1) % buddhaData.length; renderDetail(); triggerAutoScroll(); }
+    function prevDeity() { currentIndex = (currentIndex - 1 + buddhaData.length) % buddhaData.length; renderDetail(); triggerAutoScroll(); }
 
     const nameListDiv = document.getElementById('nameList');
     buddhaData.forEach((item, index) => {
