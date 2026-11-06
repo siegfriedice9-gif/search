@@ -9,7 +9,7 @@
 (function () {
   'use strict';
 
-  const ENDPOINT = 'https://script.google.com/macros/s/AKfycbzM7tshgTRAIqhFoXfx5-h8YmbSefrbPKquKz13NoQ4mQoMnc9_5cxv8VYgOUaE_WdZ/exec';
+  const ENDPOINT = 'https://script.google.com/macros/s/AKfycbyOABbtzt0A7VcBPNnkjuF_ebw1YCqtq367fzJmKT89aIClYHVo_Q--Jt5FoBENK2aL/exec';
   const KEY = 'horakuji_search_visit_recorded_v1';
 
   function newEventId() {
