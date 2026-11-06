@@ -201,6 +201,16 @@
     let currentFontSize = 'medium'; 
     let slideTimer;
 
+    // 十二天だけ、おみくじ検証版の確認済み個別イラストを表示する。
+    // 旧写真 image/14.jpg〜image/25.jpg は代替表示用に保持する。
+    function getImagePath(id) {
+        if (Number.isInteger(id) && id >= 14 && id <= 25) {
+            const illustration = `⑤_${id - 13}.jpg`;
+            return `https://siegfriedice9-gif.github.io/omikuji-preview/image/${encodeURIComponent(illustration)}`;
+        }
+        return `image/${id}.jpg`;
+    }
+
     function initSlideshow() {
         const shuffled = [...Array(33).keys()].map(i => i + 1).sort(() => 0.5 - Math.random());
         const images = shuffled.slice(0, 10);
@@ -208,8 +218,18 @@
         function start() {
             if (count >= 10) { stopSlideshowAndGo(); return; }
             const img = document.getElementById('slideshow-img');
-            img.src = `image/${images[count]}.jpg`;
-            img.onerror = () => { img.src = `https://via.placeholder.com/400?text=No+Image`; };
+            const imageId = images[count];
+            img.dataset.usedFallback = '';
+            img.onerror = () => {
+                if (imageId >= 14 && imageId <= 25 && img.dataset.usedFallback !== '1') {
+                    img.dataset.usedFallback = '1';
+                    img.src = `image/${imageId}.jpg`;
+                } else {
+                    img.onerror = null;
+                    img.src = 'https://via.placeholder.com/400?text=No+Image';
+                }
+            };
+            img.src = getImagePath(imageId);
             count++;
             slideTimer = setTimeout(start, 250); 
         }
@@ -247,10 +267,10 @@
         view.className = `detail-content ${currentLayout}`;
         view.innerHTML = `
             <div class="img-area">
-                <img src="image/${data.id}.jpg" 
+                <img src="${getImagePath(data.id)}" 
                      class="clickable-img" 
                      onclick="this.classList.toggle('expanded')"
-                     onerror="this.src='https://via.placeholder.com/400?text=${encodeURIComponent(data.name)}'">
+                     onerror="if(this.dataset.usedFallback){this.onerror=null;this.src='https://via.placeholder.com/400?text=${encodeURIComponent(data.name)}'}else{this.dataset.usedFallback='1';this.src='image/${data.id}.jpg'}">
             </div>
             <div class="info-area">
                 <div>
