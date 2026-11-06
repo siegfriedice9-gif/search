@@ -1,6 +1,10 @@
 /**
+ * @OnlyCurrentDoc
+ */
+/**
  * 法楽寺おみくじ実行回数＋仏様検索訪問回数の共通集計（Google スプレッドシートに紐づく Apps Script）。
- * 取得する情報: 記録時刻（JST）・年・年月・ランダムイベントIDのみ。\n * type=draw は従来の events、type=search_visit は新しい search_events に書き込む。
+ * 取得する情報: 記録時刻（JST）・年・年月・ランダムイベントIDのみ。
+ * type=draw は従来の events、type=search_visit は新しい search_events に書き込む。
  * 管理者の数字は公開しない。スプレッドシートの共有を「制限付き」にすること。
  */
 const EVENTS_SHEET_NAME = 'events';
